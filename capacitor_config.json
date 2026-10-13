@@ -1,0 +1,6 @@
+{
+  "appId": "com.marianobazan.palabrazo",
+  "appName": "Palabrazo",
+  "webDir": "www",
+  "android": { "backgroundColor": "#6a1fd0" }
+}
