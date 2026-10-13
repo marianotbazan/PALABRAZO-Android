@@ -22,6 +22,38 @@ workflows:
         script: npm install
       - name: Agregar proyecto Android
         script: npx cap add android
+      - name: Configurar firma de la app (Android signing)
+        script: |
+          cd android
+          python3 - <<'EOF'
+          import re
+          path = "app/build.gradle"
+          with open(path) as f:
+              content = f.read()
+
+          signing_block = '''
+              signingConfigs {
+                  release {
+                      storeFile file(System.getenv("CM_KEYSTORE_PATH"))
+                      storePassword System.getenv("CM_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("CM_KEY_ALIAS")
+                      keyPassword System.getenv("CM_KEY_PASSWORD")
+                  }
+              }
+          '''
+
+          content = content.replace("android {", "android {\n" + signing_block, 1)
+
+          content = re.sub(
+              r'(buildTypes\s*\{\s*release\s*\{)',
+              r'\1\n            signingConfig signingConfigs.release',
+              content
+          )
+
+          with open(path, "w") as f:
+              f.write(content)
+          EOF
+          cat app/build.gradle
       - name: Generar ícono de la app (desde resources/icon.png)
         script: npx @capacitor/assets generate --iconBackgroundColor '#6a1fd0' --iconBackgroundColorDark '#2b0d55' --android
       - name: Sincronizar Capacitor
