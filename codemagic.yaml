@@ -4,10 +4,10 @@ workflows:
   android-release:
     name: Palabrazo Android
     max_build_duration: 60
-    instance_type: linux_x2
+    instance_type: linux
     environment:
       android_signing:
-        - palabrazo_keystore   # ⚠️ nombre del keystore que vas a crear en Codemagic (Team settings > Code signing identities > Android)
+        - palabrazo_keystore   # nombre de referencia del keystore ya cargado en Codemagic (Team settings > Code signing identities > Android)
       vars:
         PACKAGE_NAME: "com.marianobazan.palabrazo"
       node: 20
