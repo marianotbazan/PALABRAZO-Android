@@ -22,6 +22,11 @@ workflows:
         script: npm install
       - name: Agregar proyecto Android
         script: npx cap add android
+      - name: Subir versión mínima de Android (SDK 24)
+        script: |
+          cd android
+          sed -i.bak -E 's/minSdkVersion[[:space:]]*=[[:space:]]*[0-9]+/minSdkVersion = 24/' variables.gradle
+          cat variables.gradle
       - name: Configurar firma de la app (Android signing)
         script: |
           cd android
