@@ -22,11 +22,16 @@ workflows:
         script: npm install
       - name: Agregar proyecto Android
         script: npx cap add android
-      - name: Subir versión mínima de Android (SDK 24)
+      - name: Subir versiones de Android (min 24, target/compile 36)
         script: |
           cd android
           sed -i.bak -E 's/minSdkVersion[[:space:]]*=[[:space:]]*[0-9]+/minSdkVersion = 24/' variables.gradle
+          sed -i.bak -E 's/compileSdkVersion[[:space:]]*=[[:space:]]*[0-9]+/compileSdkVersion = 36/' variables.gradle
+          sed -i.bak -E 's/targetSdkVersion[[:space:]]*=[[:space:]]*[0-9]+/targetSdkVersion = 36/' variables.gradle
           cat variables.gradle
+      - name: Instalar plataforma Android 36 en el SDK
+        script: |
+          yes | sdkmanager --install "platforms;android-36" "build-tools;36.0.0" || true
       - name: Configurar firma de la app (Android signing)
         script: |
           cd android
@@ -54,6 +59,17 @@ workflows:
               r'\1\n            signingConfig signingConfigs.release',
               content
           )
+
+          # Forzar versión reciente de Play Billing Library (requerida por Google Play)
+          if "configurations.all" not in content:
+              content += '''
+          configurations.all {
+              resolutionStrategy {
+                  force "com.android.billingclient:billing:8.0.0"
+                  force "com.android.billingclient:billing-ktx:8.0.0"
+              }
+          }
+          '''
 
           with open(path, "w") as f:
               f.write(content)
