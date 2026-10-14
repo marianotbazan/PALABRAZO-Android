@@ -71,6 +71,18 @@ workflows:
           }
           '''
 
+          # Hacer que versionCode/versionName tomen el número de build real (no quedar fijo en 1 / 1.0)
+          content = re.sub(
+              r'versionCode\s+\d+',
+              'versionCode (project.hasProperty("versionCode") ? (project.property("versionCode") as Integer) : 1)',
+              content
+          )
+          content = re.sub(
+              r'versionName\s+"[^"]*"',
+              'versionName (project.hasProperty("versionName") ? project.property("versionName") : "1.0")',
+              content
+          )
+
           with open(path, "w") as f:
               f.write(content)
           EOF
